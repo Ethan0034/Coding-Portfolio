@@ -1,0 +1,49 @@
+import sympy
+import random
+
+#P is a prime
+#G is a primitive root modulo p
+
+#a,b secret values can be any value
+#A,B public values should give result of key
+
+
+def primitive_root(p):
+    primitive_roots=[]
+    for i in range(2,p):
+        L=[]
+        y=True
+        for j in range(0,p-1):
+            x=pow(i,j)%p
+            if x in L:
+                y=False
+            else:
+                L.append(x)
+        if y == True:
+           primitive_roots.append(i)
+    return(random.choice(primitive_roots))
+    
+
+def diffie_hellman_key():
+    
+#pick a random prime
+    p=sympy.randprime(3,1000)
+    
+#get a list of primitive root modulo p
+#randomply pick G from that list
+    g=primitive_root(p)
+                
+#randomly pick integers a,b for secret values
+    a=random.randint(3,1000)
+    b=random.randint(3,1000)
+
+#Use equations to get A,B
+    A=pow(g,a)%p
+    B=pow(g,b)%p
+    
+#Use equations to get s1,s2
+    s1=pow(B,a)%p
+    s2=pow(A,b)%p
+
+    print(p,g,a,b,A,B,s1,s2)
+
