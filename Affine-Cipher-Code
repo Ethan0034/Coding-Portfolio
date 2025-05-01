@@ -1,0 +1,49 @@
+def decrypt_affine():
+    #List of a inverses
+    inverse=[1,9,21,15,3,19,7,23,11,5,17,25]
+    
+    #List of possible b values
+    b_value=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
+    
+    #String of letters in the alphabet
+    alphabet='abcdefghijklmnopqrstuvwxyz'
+    
+    #Cipher text we are decrypting
+    cipher_text='KQEREJEBCPPCJCRKIEACUZBKRVPKRBCIBQCARBJCVFCUPKRIOFKPACUZQEPBKRXPEIIEABDKPBCPFCDCCAFIEABDKPBCPFEQPKAZBKRHAIBKAPCCIBURCCDKDCCJCIDFUIXPAFFERBICZDFKABICBBENEFCUPJCVKABPCYDCCDPKBCOCPERKIVKSCPICBRKIJPKABI'
+    
+    #Switching the cipher text to all lowercase
+    cipher_text=cipher_text.lower()
+    
+    
+    
+    #Go through the list of inverse numbers
+    for a in inverse:
+        #Go through the possible b values
+        for b in b_value:
+            #Create an empty list to add words to
+            sentence=[]
+            #Go through the letters in Ciphertext
+            for i in cipher_text:
+                # if i is in the alphabet
+                if i in alphabet:
+                    #find y which is the letters numerical values
+                    y=alphabet.index(i)
+                    #Plug in a,b, and y values in to decryption formula
+                    value=(a*(y-b))%26
+                    #turn value back into letter
+                    decryption=alphabet[value]
+                    #add letter to sentence list
+                    sentence.append(decryption)
+                #else if there is a space, period, or question mark
+                elif i == ' ' or '.' or '?':
+                    #add those elements to sentence
+                    sentence.append(i)
+            
+            #format sentence 
+            plaintext= ''.join(sentence)
+            s=(plaintext.split())
+            print(a,b,s)
+
+
+
+         
