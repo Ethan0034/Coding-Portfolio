@@ -1,0 +1,283 @@
+#Resources used for the project
+        #Used open hands policy with Ryan Lang
+    #1: https://www.geeksforgeeks.org/python-convert-string-to-bytes/ 
+        #I used this in the stringtobinary function
+    #2: https://exploit-notes.hdks.org/exploit/cryptography/conversion/zero-padding-in-python/
+        #I used this for padding in the stringtobinary function
+    #3: https://www.geeksforgeeks.org/python-program-to-convert-a-list-to-string/ 
+        #I used this find how to swap in the initial permutation function
+    #4: https://www.geeksforgeeks.org/break-list-chunks-size-n-python/
+        #I used this to figure out how to create chunks from a string
+    
+    
+IP_map = [
+    57, 49, 41, 33, 25, 17, 9, 1,
+    59, 51, 43, 35, 27, 19, 11, 3,
+    61, 53, 45, 37, 29, 21, 13, 5,
+    63, 55, 47, 39, 31, 23, 15, 7,
+    56, 48, 40, 32, 24, 16, 8, 0,
+    58, 50, 42, 34, 26, 18, 10, 2,
+    60, 52, 44, 36, 28, 20, 12, 4,
+    62, 54, 46, 38, 30, 22, 14, 6
+]
+
+    
+# Permuted Choice Table 1 (For the key schedule)
+PC1 = [56, 48, 40, 32, 24, 16, 8, 0, 57, 49, 41, 33, 25, 17,
+       9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51, 43, 35,
+        62, 54, 46, 38, 30, 22, 14, 6, 61, 53, 45, 37, 29, 21,
+       13, 5, 60, 52, 44, 36, 28, 20, 12, 4, 27, 19, 11, 3]
+
+# Permuted Choice Table 2 (For the key schedule)
+PC2 = [13, 16, 10, 23, 0, 4, 2, 27, 14, 5, 20, 9,
+       22, 18, 11, 3, 25, 7, 15, 6, 26, 19, 12, 1,
+       40, 51, 30, 36, 46, 54, 29, 39, 50, 44, 32, 47,
+       43, 48, 38, 55, 33, 52, 45, 41, 49, 35, 28, 31]
+
+# Shift per round (for the key schedule)
+shifts = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
+
+ 
+SBoxes = [
+    [[14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7],
+     [0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8],
+     [4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0],
+     [15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13]],
+
+    [[15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10],
+     [3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5],
+     [0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15],
+     [13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9]],
+
+    [[10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8],
+     [13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1],
+     [13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7],
+     [1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12]],
+
+    [[7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15],
+     [13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9],
+     [10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4],
+     [3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14]],
+
+    [[2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9],
+     [14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6],
+     [4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14],
+     [11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3]],
+
+    [[12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11],
+     [10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8],
+     [9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6],
+     [4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13]],
+
+    [[4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1],
+     [13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6],
+     [1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2],
+     [6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12]],
+
+    [[13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7],
+     [1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2],
+     [7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8],
+     [2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11]]]
+
+# Final Permutation mapping
+FP_map = [
+    39, 7, 47, 15, 55, 23, 63, 31,
+    38, 6, 46, 14, 54, 22, 62, 30,
+    37, 5, 45, 13, 53, 21, 61, 29,
+    36, 4, 44, 12, 52, 20, 60, 28,
+    35, 3, 43, 11, 51, 19, 59, 27,
+    34, 2, 42, 10, 50, 18, 58, 26,
+    33, 1, 41, 9, 49, 17, 57, 25,
+    32, 0, 40, 8, 48, 16, 56, 24]
+    
+#Step 1: Get plaintext and convert it to binary.
+
+def stringtobinary(p):
+    #This takes the string and turns it into a binary string
+    x=p.encode('utf-8')
+    
+    #This outputs the code as 0s and 1s
+    x = ''.join(format(ord(i), '08b') for i in p)
+    
+    #This pads the string to be 64 bits long
+    x=x.zfill(64)
+    return(x)
+    #print(type(x))
+
+#Step 2: DES Algorithm
+
+#Step 2.1: Initial Permutation
+def initialpermutation(x):
+    
+    #This function creates a new list 
+    new_list=[]
+    
+    #Reorder the str based on IP Map table
+    for i in IP_map:
+        new_list.append(x[i])
+    plaintext=''.join(new_list)
+    return(plaintext)
+    #print(type(plaintext))
+
+#Step 2.2 Key Schedule Generation
+
+def key_schedule():
+    master_key = "0100100001001111010101110100010001011001010001000100111101001111"
+    # Permuting the master key according to PC1
+    master_key = [master_key[i] for i in PC1]
+    round_keys = []
+    C0 = master_key[0:28] # Get the left half of the permuted master key
+    D0 = master_key[28:] # Get the left half of the permuted master key
+    for i in range(16):
+        C0 = C0[shifts[i]:] + C0[:shifts[i]] # Shift tthe halves according to what round we are currently on
+        D0 = D0[shifts[i]:] + D0[:shifts[i]]
+        # Join the two halves back together
+        CD = C0+D0
+        # Use PC2 to find the round key at append it to our list
+        round_keys.append(''.join([CD[i] for i in PC2]))
+    return round_keys
+
+#Step 2.3 expand R
+def expand_R(R_i):
+    # Lists the mapping to get from 32 "bits" to 48 "bits"
+    mapping = [31, 0, 1, 2, 3, 4, 3, 4, 5, 6, 7, 8, 7, 8, 9, 10, 11, 12, 11, 12,
+               13, 14, 15, 16,
+               15, 16, 17, 18, 19, 20, 19, 20, 21, 22, 23, 24, 23, 24, 25, 26, 27,
+               28, 27, 28, 29, 30, 31, 0]
+    # Create the expanded R_i using the above mapping
+    expanded_R_i = ''.join([R_i[i] for i in mapping])
+    return expanded_R_i
+
+# This function takes in a STRING of 0s and 1s assuming it's a binary string,
+# and returns its integer value
+# I ASSUME BIG-ENDIAN FORMAT
+def bin_to_int(bin_str):
+    # Convert my strong of 0s and 1s into a list of 0s and 1s
+    bin_list = [int(c) for c in bin_str]
+    # Go through each item in my binary list and add onto vavlue when necessary
+    value = 0
+    for i in range(len(bin_list)):
+        if bin_list[i]:
+            value += 2**(len(bin_str)-i-1)
+    return value
+
+# This function takes in an integer and converts it to a binary string
+def int_to_bin(x):
+    bin_list = []
+    mod_val = 2
+    while x > 0:
+        if x % mod_val:
+            bin_list.append("1")
+            x -= (x % mod_val)
+        else:
+            bin_list.append("0")
+        mod_val *= 2
+    return "".join(bin_list[::-1])
+
+
+#Step 2.4 The Round Function(Repeat for 16 rounds)
+def round_function(plaintext):
+    
+    #Get the round kyes
+    round_key=key_schedule()
+    
+    #Split L and R into length 32 
+    L=plaintext[:32]
+    R=plaintext[32:]
+    
+    #Loop through the 16 rounds
+    for key in (round_key):
+    
+        #Expand R ino 48 bit str to get newR
+        Ri=expand_R(R)
+        
+        #XOR the key and the expanded R (newR) and turn it into a str
+        R1=[]
+        index=0
+        for bit in key:
+            if bit==Ri[index]:
+                R1.append('0')
+            else:
+                R1.append('1')
+            index+=1
+        R1=''.join(R1)
+        
+        #Create 8 groups of 6 bits
+        group=[]
+        for i in range(0,len(R1),6):
+            group.append(R1[i:i+6])
+            
+        
+        tempR=[]
+        
+        #Loop through the different groups of 6 bits
+        for x in group:
+            
+            #In each group use the outside bits to get the row and the inside bits to get the column
+            row=x[0]+x[5]
+            column=x[1:5]
+            
+            #change the values of these to integers
+            row= bin_to_int(row)
+            column=bin_to_int(column)
+            #print(row,column)
+            
+            #loop through each 8 s-boxes
+            for y in SBoxes:
+                
+                #if the index of group matches the index of the s-box
+                if (group.index(x)==SBoxes.index(y)):
+                    
+                    #find the value represented by the row and column given by the x
+                    value=y[row][column]
+                    #print(value)
+                    
+                    #change the integer value given to binary and pad if needed
+                    value=int_to_bin(value)
+                    value=value.zfill(4)
+                    tempR.append(value)
+        
+        # change tempR into a str instead of list
+        tempR="".join(tempR)
+        
+        
+        newR=[]
+        count=0
+        
+        #XOR the R value and the prevous L value
+        for bit in tempR:
+            if bit==L[count]:
+                newR.append('0')
+            else:
+                newR.append('1')
+            count+=1
+        
+        #Turn newR into a str instead of list 
+        newR=''.join(newR)
+        
+        #Set L to previous R and set R=to new R
+        L=R
+        R=newR
+    return(L,R)
+
+#Step 2.5 final permutation
+def final_permutation(L,R):  
+    
+    #Swap L and R so R comes first
+    string=R+L     
+
+    #Swap the order of the str based on FP map
+    final_list=[]
+    for i in FP_map:
+        final_list.append(string[i])
+    ciphertext=''.join(final_list)
+    return(ciphertext)
+
+#Step 3 run all DES functions together to encrypt 
+def des_encryption(plaintext):
+    a=stringtobinary(plaintext)
+    b=initialpermutation(a)
+    c=round_function(b)
+    d=final_permutation(c[0],c[1])
+    print(d)
+            
