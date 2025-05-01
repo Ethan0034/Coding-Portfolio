@@ -1,0 +1,56 @@
+from math import gcd
+
+#set the ciphertext
+ciphertext='KCCPKBGUFDPHQTYAVINRRTMVGRKDNBVFDETDGILTXRGUDDKOTFMBPVGEGLTGCKQRACQCWDNAWCRXIZAKFTLEWRPTYCQKYVXCHKFTPONCQQRHJVAJUWETMCMSPKQDYHJVDAHCTRLSVSKCGCZQQDZXGSFRLSWCWSJTBHAFSIASPRJAHKJRJUMVGKMITZHFPDISPZLVLGWTFPLKKEBDPGCEBSHCTJRWXBAFSPEZQNRWXCVYCGAONWDDKACKAWBBIKFTIOVKCGGHJVLNHIFFSQESVYCLACNVRWBBIREPBBVFEXOSCDYGZWPFDTKFQIYCWHJVLNHIQIBTKHJVNPIST'
+ciphertext=''.join(c for c in ciphertext if c.isalpha())
+
+#find trigrams in cipher text
+trigram_freq ={}
+for i in range(len(ciphertext)-2):
+    temp_str=ciphertext[i:i+3]
+    if temp_str in trigram_freq:
+        trigram_freq[temp_str].append(i)
+    else:
+        trigram_freq[temp_str] = [i]
+
+trigram_freq = {k:v for k,v in trigram_freq.items() if len(v) > 1}
+
+#find the possible distances between each trigram patterns to find keylength
+possible_lengths={}
+for k,v in trigram_freq.items():
+    if len(v) == 2:
+        length = v[1]-v[0]
+        if length in possible_lengths:
+            possible_lengths[length] += 1
+        else:
+            possible_lengths[length]=1
+    else:
+        distances=[]
+        for i in range(len(v)-1):
+            distances.append(v[i+1]-v[i])
+        for i in range(len(distances)-1):
+            find_gcd=gcd(distances[i], distances[i+1])
+            if find_gcd in possible_lengths:
+                possible_lengths[find_gcd]+= 1
+            else:
+                possible_lengths[find_gcd] = 1
+print(possible_lengths)
+
+
+#create dictionary of each position letters and count frequency of letters at each position
+lists = {0:[],1:[],2:[],3:[],4:[],5:[]}
+index=0
+for i in ciphertext:
+    alpha = index % 6
+    lists[alpha].append(i)
+    index += 1
+for i,v in lists.items():
+    print(i,v)
+    dict={}
+    for letter in v:
+        if letter in dict:
+            dict[letter] +=1
+        else:
+            dict[letter]= 1
+    for k,x in dict.items():
+        print(k,x)
