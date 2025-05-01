@@ -1,0 +1,63 @@
+#Ciphertext we are trying to decrypt
+ciphertext='EMGLOSUDCGDNCUSWYSFHNSFCYKDPUMLWGYICOXYSIPJCKQPKUGKMGOLICGINCGACKSNISACYKZSCKXECJCKSHYSXCGOIDPKZCNKSHICGIWYGKKGKGOLDSILKGOIUSIGLEDSPWZUGFZCCNDGYYSFUSZCNXEOJNCGYEOWEUPXEZGACGNFGLKNSACIGOIYCKXCJUCIUZCFZCCNDGYYSFEUEKUZCSOCFZCCNCIACZEJNCSHFZEJZEGMXCYHCJUMGKUCY'
+
+#find the frequency of each letter in ciphertext
+letter_freq ={}
+for i in range(len(ciphertext)):
+    temp_str=ciphertext[i:i+1]
+    if temp_str in letter_freq:
+        letter_freq[temp_str] += 1
+    else:
+        letter_freq[temp_str] = 1
+letter_freq = {k:v for k,v in letter_freq.items() if v > 1}
+
+        
+#print (letter_freq)
+
+#find the frequency of bigrams in ciphertext
+bigram_freq ={}
+for i in range(len(ciphertext)-2):
+    temp_str=ciphertext[i:i+2]
+    if temp_str in bigram_freq:
+        bigram_freq[temp_str] += 1
+    else:
+        bigram_freq[temp_str] = 1
+
+bigram_freq = {k:v for k,v in bigram_freq.items() if v > 1}
+#print (bigram_freq)
+
+#find the frequency of trigrams in ciphertext
+trigram_freq ={}
+for i in range(len(ciphertext)-2):
+    temp_str=ciphertext[i:i+3]
+    if temp_str in trigram_freq:
+        trigram_freq[temp_str] += 1
+    else:
+        trigram_freq[temp_str] = 1
+trigram_freq = {k:v for k,v in trigram_freq.items() if v > 1}
+#print (trigram_freq)
+
+#find the frequency of quadrigrams in ciphertext
+quadrigram_freq ={}
+for i in range(len(ciphertext)-2):
+    temp_str=ciphertext[i:i+4]
+    if temp_str in quadrigram_freq:
+        quadrigram_freq[temp_str] += 1
+    else:
+        quadrigram_freq[temp_str] = 1
+
+quadrigram_freq = {k:v for k,v in quadrigram_freq.items() if v > 1}
+#print (quadrigram_freq)
+
+#print ciphertext
+#print(ciphertext)
+
+#map letters from ciphertext using frequency analysis and substitute in 
+mapping={'F':'W','C':'E','D':'B','H':'F','G':'A','I':'D','K':'S','N':'L','O':'N','S':'O','U':'T','Y':'R','Z':'H','W':'G','E':'I','P':'U','L':'Y','X':'P','J':'C', 'Q':'J','A':'V'}
+for i,j in mapping.items():
+        plaintext = ''.join(mapping.get(char, char) for char in ciphertext)
+        plantext=ciphertext.replace(i,j)
+        
+        
+#print the plaintext
+print(plaintext)
